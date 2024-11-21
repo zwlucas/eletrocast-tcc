@@ -37,7 +37,6 @@ Para configurar a infraestrutura de streaming, iremos usar o **NGINX com o módu
           listen 1935;
           chunk_size 4096;
 
-          # Aceitar streams
           application live {
               live on;
               record off;
@@ -58,10 +57,20 @@ Para configurar a infraestrutura de streaming, iremos usar o **NGINX com o módu
           server_name localhost;
 
           location /hls {
+              add_header 'Access-Control-Allow-Origin' '*';
+              add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+              add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept';
+              add_header 'Access-Control-Allow-Credentials' 'true';
+
+              if ($request_method = 'OPTIONS') {
+                return 204;
+              }
+
               types {
                   application/vnd.apple.mpegurl m3u8;
                   video/mp2t ts;
               }
+
               root /tmp;
               add_header Cache-Control no-cache;
           }
@@ -103,18 +112,36 @@ Para configurar a infraestrutura de streaming, iremos usar o **NGINX com o módu
 ---
 
 ### **Passo 3: Reproduzir o Stream no Navegador**
-- Use um player HLS como [Video.js](https://videojs.com/):
+- Use um player HLS como [HLS.js](https://github.com/video-dev/hls.js):
   ```html
   <!DOCTYPE html>
   <html lang="en">
   <head>
-      <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+      <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   </head>
   <body>
-      <video id="live-stream" class="video-js vjs-default-skin" controls autoplay width="640" height="360">
-          <source src="http://<IP do servidor>/hls/test.m3u8" type="application/x-mpegURL">
-      </video>
-      <script src="https://vjs.zencdn.net/7.20.3/video.js"></script>
+      <video id="live-video" class="video-js vjs-default-skin" controls preload="auto" width="640" height="360">
+        <source id="video-source" type="application/x-mpegURL">
+    </video>
+    
+    <script>
+        var video = document.getElementById('live-video');
+        var videoSource = document.getElementById('video-source');
+        
+        if (Hls.isSupported()) {
+            var hls = new Hls();
+            hls.loadSource('http://<IP do servidor>/hls/live.m3u8');
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play();
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = 'http://<IP do servidor>/hls/live.m3u8';
+            video.addEventListener('loadedmetadata', function() {
+                video.play();
+            });
+        }
+    </script>
   </body>
   </html>
   ```
@@ -136,5 +163,3 @@ Para configurar a infraestrutura de streaming, iremos usar o **NGINX com o módu
   }
   ```
 - Para maior segurança, integrar autenticação via tokens no futuro.
-
----
