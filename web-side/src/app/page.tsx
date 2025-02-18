@@ -1,8 +1,10 @@
 import { Header } from "./components/Header";
 import { VideoPlayer } from "./components/VideoPlayer";
 import { ChatInterface } from "./components/ChatInterface";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
 
-export default function Home() {
+export default async function Home() {
     return (
         <div className="min-h-screen bg-[#0E0E10]">
             <Header />

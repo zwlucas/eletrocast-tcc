@@ -12,7 +12,7 @@ export function VideoPlayer() {
         if (!video) return
 
         if (Hls.isSupported()) {
-            var hls = new Hls();
+            const hls = new Hls();
 
             hls.loadSource('http://localhost/hls/teste.m3u8');
             hls.attachMedia(video);
