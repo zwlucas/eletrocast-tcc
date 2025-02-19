@@ -58,16 +58,56 @@ export const signInAction = async (formData: FormData) => {
 
 export const signGoogle = async () => {
     const supabase = await createClient();
+    const origin = (await headers()).get("origin");
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
+        options: {
+            redirectTo: `${origin}/auth/callback`
+        }
     });
 
     if (error) {
         return encodedRedirect("error", "/sign-in", error.message);
     }
 
-    return redirect("/");
+    return redirect(data.url);
+}
+
+export const signGithub = async () => {
+    const supabase = await createClient();
+    const origin = (await headers()).get("origin");
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+            redirectTo: `${origin}/auth/callback`
+        }
+    });
+
+    if (error) {
+        return encodedRedirect("error", "/sign-in", error.message);
+    }
+
+    return redirect(data.url);
+}
+
+export const signDiscord = async () => {
+    const supabase = await createClient();
+    const origin = (await headers()).get("origin");
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "discord",
+        options: {
+            redirectTo: `${origin}/auth/callback`
+        }
+    });
+
+    if (error) {
+        return encodedRedirect("error", "/sign-in", error.message);
+    }
+
+    return redirect(data.url);
 }
 
 export const forgotPasswordAction = async (formData: FormData) => {

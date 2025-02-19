@@ -10,7 +10,7 @@ export default async function AuthButton() {
 
     return user ? (
         <div className="flex items-center gap-4">
-            Olá, {user.email}
+            Olá, {user.user_metadata?.name || user.user_metadata?.user_name || user.email}
 
             <form action={signOutAction}>
                 <Button type="submit" variant={"outline"}>
