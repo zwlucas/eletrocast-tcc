@@ -1,15 +1,18 @@
-import { FormMessage, Message } from "@/components/form-message";
 import Link from "next/link";
+
+import { FcGoogle } from "react-icons/fc";
+import { FaDiscord, FaGithub } from "react-icons/fa";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { SubmitButton } from "@/components/submit-button";
-import { signInAction, signGoogle, signGithub, signDiscord } from "@/app/actions";
-import { FcGoogle } from "react-icons/fc";
-import { FaApple, FaMicrosoft, FaDiscord, FaGithub } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
+import { FormMessage, Message } from "@/components/form-message";
+
+import { signInAction, signGoogle, signGithub, signDiscord } from "@/app/actions";
 
 export default async function Login(props: { searchParams: Promise<Message> }) {
-    const searchParams = await props.searchParams
+    const searchParams = await props.searchParams;
 
     return (
         <>
@@ -58,5 +61,5 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                 </Button>
             </div>
         </>
-    )
+    );
 }

@@ -1,7 +1,8 @@
-import { FormMessage, Message } from "@/components/form-message";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/submit-button";
+import { FormMessage, Message } from "@/components/form-message";
+
 import { resetPasswordAction } from "@/app/actions";
 
 export default async function ResetPassword(props: { searchParams: Promise<Message>; }) {
@@ -27,5 +28,5 @@ export default async function ResetPassword(props: { searchParams: Promise<Messa
 
             <FormMessage message={searchParams} />
         </form>
-    )
+    );
 }

@@ -1,10 +1,12 @@
-import { createClient } from "@/utils/supabase/server";
-import { Button } from "./ui/button";
 import Link from "next/link";
+
+import { Button } from "./ui/button";
+
+import { createClient } from "@/utils/supabase/server";
 import { signOutAction } from "@/app/actions";
 
 export default async function AuthButton() {
-    const supabase = await createClient()
+    const supabase = await createClient();
 
     const { data: { user }, } = await supabase.auth.getUser();
 
@@ -13,7 +15,7 @@ export default async function AuthButton() {
             Olá, {user.user_metadata?.name || user.user_metadata?.user_name || user.email}
 
             <form action={signOutAction}>
-                <Button type="submit" variant={"outline"}>
+                <Button type="submit" variant="outline">
                     Sair
                 </Button>
             </form>
@@ -27,5 +29,5 @@ export default async function AuthButton() {
                 <Link href="/sign-up">Cadastrar-se</Link>
             </Button>
         </div>
-    )
+    );
 }
