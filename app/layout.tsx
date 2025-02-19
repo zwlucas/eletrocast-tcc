@@ -7,6 +7,8 @@ import HeaderAuth from "@/components/header-auth";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
+import { SpeedInsights } from '@vercel/speed-insights/next';
+
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
@@ -43,6 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                         
                         <div className="flex flex-col gap-20 max-w-5xl p-5">
                             {children}
+                            <SpeedInsights />
                         </div>
                     </div>
                 </main>
