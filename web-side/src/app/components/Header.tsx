@@ -1,13 +1,9 @@
 import { Bell, MessageSquare, User } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
 import AuthButton from "./AuthButton";
+import { Session } from "@supabase/supabase-js";
 
-export async function Header() {
-    const supabase = createServerComponentClient({ cookies })
-    const { data: { session }, } = await supabase.auth.getSession()
-
+export async function Header({ session }: { session: Session | null }) {
     return (
         <header className="bg-[#18181B] text-white p-2">
             <div className="container mx-auto flex items-center justify-between">

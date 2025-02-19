@@ -5,9 +5,12 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 
 export default async function Home() {
+    const supabase = createServerComponentClient({ cookies })
+    const { data: { session }, } = await supabase.auth.getSession()
+    
     return (
         <div className="min-h-screen bg-[#0E0E10]">
-            <Header />
+            <Header session={session} />
             <div className="flex">
                 <main className="flex-1 p-4">
                     <div className="container mx-auto">
@@ -23,7 +26,7 @@ export default async function Home() {
                                 </div>
                             </div>
                             <div className="lg:col-span-1 h-[calc(100vh-5rem)]">
-                                <ChatInterface />
+                                <ChatInterface user={session?.user} />
                             </div>
                         </div>
                     </div>
