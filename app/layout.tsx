@@ -6,7 +6,6 @@ import { ThemeProvider } from "next-themes";
 import HeaderAuth from "@/components/header-auth";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import "./globals.css";
@@ -21,7 +20,7 @@ const geistSans = Geist({
 export const metadata: Metadata = {
     metadataBase: new URL(defaultUrl),
     title: "Eletrocast",
-    description: "Podcast website",
+    description: "Made by Mackenzie (Lucas Faria) or .DEV",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
