@@ -17,7 +17,7 @@ export default function Live() {
     }, [])
 
     return (
-        <>
+        <div className="gap-0">
             <Toaster />
             <main className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 p-6">
                 <div className="lg:col-span-3 space-y-6">
@@ -110,6 +110,6 @@ export default function Live() {
                     </div>
                 </div>
             </main>
-        </>
+        </div>
     );
 }
