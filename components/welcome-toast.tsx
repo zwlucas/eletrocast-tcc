@@ -7,7 +7,7 @@ export function WelcomeToast() {
   useEffect(() => {
     showNotification(
       "Bem-vindo ao Eletrocast! 👋",
-      "Fique à vontade para participar do chat e interagir com a comunidade.",
+      "Essa página se encontra em desenvolvimento.",
     )
   }, [])
 
