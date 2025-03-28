@@ -6,210 +6,172 @@ import { SubscribeButton } from "@/components/subscribe-button"
 import { ChatForm } from "@/components/chat-form"
 import { WelcomeToast } from "@/components/welcome-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-type VideoDetails = {
-    id: string;
-    title: string;
-    description: string;
-    views: number;
-    likes: number;
-    dislikes: number;
-    publishedAt: string;
-};
-
-type ChannelDetails = {
-    id: string;
-    name: string;
-    avatar: string;
-    subscribers: number;
-};
-
-type ChatMessage = {
-    id: string;
-    user: {
-        id: string;
-        name: string;
-        avatar: string;
-    };
-    message: string;
-};
-
-async function getVideoDetails(videoId: string): Promise<VideoDetails> {
-    return {
-        id: videoId,
-        title: "Entrevista com o prefeito de Mococa, Barison!",
-        description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sed magna massa. Pellentesque magna elit, euismod et aliquam non, vehicula quis elit. Sed blandit dictum leo sit amet vehicula. Integer placerat ut enim quis congue. Duis nec neque vitae nisl feugiat maximus non ut odio. Etiam ultrices luctus odio non volutpat. Cras sed magna sit amet nulla pharetra bibendum.",
-        views: 1234567,
-        likes: 12345,
-        dislikes: 123,
-        publishedAt: "1 dia atras",
-    };
-}
-
-async function getChannelDetails(): Promise<ChannelDetails> {
-    return {
-        id: "channel-1",
-        name: "Eletrocast",
-        avatar: "https://github.com/shadcn.png",
-        subscribers: 1000000,
-    };
-}
-
-async function getChatMessages(): Promise<ChatMessage[]> {
-    return [
-        {
-            id: "msg-1",
-            user: {
-                id: "user-1",
-                name: "Lucas Faria",
-                avatar: "https://github.com/shadcn.png",
-            },
-            message: "Salve!",
-        },
-        {
-            id: "msg-2",
-            user: {
-                id: "user-2",
-                name: "Lucas Faria",
-                avatar: "https://github.com/shadcn.png",
-            },
-            message: "Dahora!",
-        },
-    ];
-}
+import { formatCount, formatRelativeTime, getChannelDetails, getVideoComments, getChannelLatestVideoOrLiveStream, getVideoDetails, YouTubeChannel, YouTubeCommentThread, YouTubeVideo } from "@/lib/youtube"
+import { LiveBadge } from "@/components/live-badge"
+import { Button } from "@/components/ui/button"
+import { VideoPlayer } from "@/components/video-player"
 
 export default async function Home() {
-    const videoId = "sample-video-id"
-    const [video, channel, chatMessages] = await Promise.all([
-        getVideoDetails(videoId),
-        getChannelDetails(),
-        getChatMessages(),
-    ])
+    try {
+        const channelId = "UC-etkvWQOz3vkon1505s1yQ";
+    
+        const { videoId, isLive } = await getChannelLatestVideoOrLiveStream(channelId)
+        const video = await getVideoDetails(videoId)
+        const channel = await getChannelDetails(channelId)
+        const comments = await getVideoComments(videoId, 50)
 
-  return (
-    <>
-      <NotificationProvider />
-      <WelcomeToast />
+        return (
+            <>
+                <NotificationProvider />
+                <WelcomeToast />
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 lg:p-6 -mt-40">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Video and Info Section */}
-                <div className="lg:col-span-2 space-y-4 lg:space-y-6">
-                    {/* Video Player */}
-                    <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                        <video className="w-full h-full" controls>
-                            <source
-                                src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                                type="video/mp4"
-                            />
-                        </video>
-                    </div>
+                {/* Main Content */}
+                <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 lg:p-6 -mt-40">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Video and Info Section */}
+                            <div className="lg:col-span-2 space-y-4 lg:space-y-6">
+                                {/* Video Player */}
+                                <VideoPlayer videoId={videoId} title={video.snippet.title} isLive={isLive} />
 
-                    {/* Mobile Tabs */}
-                    <div className="lg:hidden">
-                        <Tabs defaultValue="info" className="w-full">
-                            <TabsList className="w-full">
-                                <TabsTrigger value="info" className="flex-1">
-                                    Informações
-                                </TabsTrigger>
-                                <TabsTrigger value="chat" className="flex-1">
-                                    Chat ao vivo
-                                </TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="info" className="mt-4">
-                                <VideoInfo video={video} channel={channel} />
-                            </TabsContent>
-                            <TabsContent value="chat" className="mt-4">
-                                <ChatSection messages={chatMessages} />
-                            </TabsContent>
-                        </Tabs>
-                    </div>
+                                {/* Mobile Tabs */}
+                                <div className="lg:hidden">
+                                    <Tabs defaultValue="info" className="w-full">
+                                        <TabsList className="w-full">
+                                            <TabsTrigger value="info" className="flex-1">
+                                                Informações
+                                            </TabsTrigger>
+                                            <TabsTrigger value="chat" className="flex-1">
+                                                {isLive ? "Chat ao vivo" : "Comentários"}
+                                            </TabsTrigger>
+                                        </TabsList>
+                                        <TabsContent value="info" className="mt-4">
+                                            <VideoInfo video={video} channel={channel} isLive={isLive} />
+                                        </TabsContent>
+                                        <TabsContent value="chat" className="mt-4">
+                                            <CommentSection comments={comments} isLive={isLive} />
+                                        </TabsContent>
+                                    </Tabs>
+                                </div>
 
-                    {/* Desktop Video Info */}
-                    <div className="hidden lg:block">
-                        <VideoInfo video={video} channel={channel} />
-                    </div>
-                </div>
+                                {/* Desktop Video Info */}
+                                <div className="hidden lg:block">
+                                    <VideoInfo video={video} channel={channel} isLive={isLive} />
+                                </div>
+                            </div>
 
-                {/* Desktop Chat Section */}
-                <div className="hidden lg:block lg:col-span-1">
-                    <ChatSection messages={chatMessages} />
-                </div>
-            </div>
-      </main>
-    </>
-  );
+                            {/* Desktop Chat Section */}
+                            <div className="hidden lg:block lg:col-span-1">
+                                <CommentSection comments={comments} isLive={isLive} />
+                            </div>
+                        </div>
+                </main>
+            </>
+        );
+    } catch (error) {
+        console.error("Error loading YouTube data:", error)
+        return <ErrorDisplay error={error as Error} />
+    }
 }
 
-function VideoInfo({
-    video,
-    channel,
-  }: {
-    video: VideoDetails
-    channel: ChannelDetails
-  }) {
+function VideoInfo({ video, channel, isLive }: { video: YouTubeVideo, channel: YouTubeChannel, isLive: boolean }) {	
+    const publishedDate = formatRelativeTime(video.snippet.publishedAt)
+    const viewCount = formatCount(video.statistics.viewCount)
+    const likeCount = formatCount(video.statistics.likeCount)
+    const subscriberCount = formatCount(channel.statistics.subscriberCount)
+
     return (
-      <div className="space-y-4">
-        <h1 className="text-xl lg:text-2xl font-semibold">{video.title}</h1>
-  
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Avatar>
-              <AvatarImage src={channel.avatar} />
-              <AvatarFallback>EC</AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="font-medium">{channel.name}</h3>
-              <p className="text-sm text-muted-foreground">{channel.subscribers.toLocaleString()} inscritos</p>
+        <div className="space-y-4">
+            <div className="flex items-center gap-2">
+                <h1 className="text-xl lg:text-2xl font-semibold">{video.snippet.title}</h1>
+                {isLive && <LiveBadge />}
             </div>
-            <SubscribeButton />
-          </div>
-  
-          <VideoActions likes={video.likes} dislikes={video.dislikes} />
-        </div>
-  
-        {/* Description */}
-        <div className="bg-muted/50 rounded-lg p-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              {video.views.toLocaleString()} visualizações • Transmitido há {video.publishedAt}
-            </p>
-            <p className="text-sm">{video.description}</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-  
-  function ChatSection({ messages }: { messages: ChatMessage[] }) {
-    return (
-      <div className="bg-muted/50 rounded-lg h-[400px] lg:h-[calc(100vh-200px)] flex flex-col">
-        <div className="p-4 border-b border-muted">
-          <h3 className="font-medium">Chat ao vivo</h3>
-        </div>
-  
-        <ScrollArea className="flex-1 p-3 md:p-4">
-          <div className="space-y-4">
-            {messages.map((msg) => (
-              <div key={msg.id} className="flex items-start gap-2">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={msg.user.avatar} />
-                  <AvatarFallback>{msg.user.name[0]}</AvatarFallback>
-                </Avatar>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">{msg.user.name}</p>
-                  <p className="text-sm text-muted-foreground">{msg.message}</p>
+    
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <Avatar>
+                        <AvatarImage src={channel.snippet.thumbnails.default.url} />
+                        <AvatarFallback>EC</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <h3 className="font-medium">{channel.snippet.title}</h3>
+                        <p className="text-sm text-muted-foreground">{subscriberCount} inscritos</p>
+                    </div>
+                    <SubscribeButton />
                 </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-  
-        <div className="p-4 border-t border-muted">
-          <ChatForm />
+    
+                <VideoActions likes={likeCount} dislikes={0} />
+            </div>
+    
+            {/* Description */}
+            <div className="bg-muted/50 rounded-lg p-4">
+                <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                        {viewCount} visualizações • {isLive ? "Ao vivo agora" : `Publicado ${publishedDate}`}
+                    </p>
+                    <p className="text-sm">{video.snippet.description}</p>
+                </div>
+            </div>
         </div>
-      </div>
     )
-  }
+}
+  
+function CommentSection({ comments, isLive }: { comments: YouTubeCommentThread[], isLive: boolean }) {
+    return (
+        <div className="bg-muted/50 rounded-lg h-[400px] lg:h-[calc(100vh-200px)] flex flex-col lg:w-[400px]">
+            <div className="p-4 border-b border-muted flex items-center justify-between">
+                <h3 className="font-medium">{isLive ? "Chat ao vivo" : `Comentários (${comments.length})`}</h3>
+                {isLive && <LiveBadge />}
+            </div>
+    
+            <ScrollArea className="flex-1 p-3 md:p-4">
+                <div className="space-y-4">
+                    {comments.length > 0 ? (
+                        comments.map((commentThread) => {
+                            const comment = commentThread.snippet.topLevelComment
+    
+                            return (
+                                <div key={commentThread.id} className="flex items-start gap-2">
+                                    <Avatar className="w-8 h-8">
+                                        <AvatarImage src={comment.snippet.authorProfileImageUrl} />
+                                        <AvatarFallback>{comment.snippet.authorDisplayName[0]}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-sm font-medium">{comment.snippet.authorDisplayName}</p>
+                                            <p className="text-xs text-muted-foreground">{formatRelativeTime(comment.snippet.publishedAt)}</p>
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">{comment.snippet.textDisplay}</p>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    ) : (
+                        <div className="text-center py-8">
+                            <p className="text-muted-foreground">
+                                {isLive ? "Ninguém está conversando no momento. Seja o primeiro a enviar uma mensagem!"
+                                    : "Nenhum comentário encontrado. Seja o primeiro a comentar!"}
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </ScrollArea>
+    
+            <div className="p-4 border-t border-muted">
+                <ChatForm isLive={isLive} />
+            </div>
+        </div>
+    )
+}
+
+function ErrorDisplay({ error }: { error: Error }) {
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background">
+            <div className="max-w-md w-full bg-muted/50 rounded-lg p-6 text-center space-y-4">
+                <h1 className="text-2xl font-bold">Erro ao carregar dados</h1>
+                <p className="text-muted-foreground">Não foi possível carregar os dados do YouTube. Por favor, tente novamente mais tarde.</p>
+                <p className="text-sm text-red-500">{error.message}</p>
+                <Button onClick={() => window.location.reload()}>Tentar novamente</Button>
+            </div>
+        </div>
+    )
+}
