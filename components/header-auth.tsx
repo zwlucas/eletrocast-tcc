@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Button } from "./ui/button";
 
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { signOutAction } from "@/app/actions";
 
 export default async function AuthButton() {
@@ -22,14 +22,6 @@ export default async function AuthButton() {
         </div>
     ) : (
         <div className="flex gap-2">
-            
-            {/* <Button asChild size="sm" variant="outline">
-                <Link href="/sign-in">Entrar</Link>
-            </Button>
-            <Button asChild size="sm" variant="default">
-                <Link href="/sign-up">Cadastrar-se</Link>
-            </Button> */}
-
             <Button asChild size="sm" variant="default">
                 <Link href="/sign-in">Entrar</Link>
             </Button>

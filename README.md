@@ -10,20 +10,13 @@ O projeto está organizado da seguinte forma:
 [`.env.example`](.env.example )         # Exemplo de variáveis de ambiente
 [`.env.local`](.env.local )           # Configurações locais de ambiente
 [`components.json`](components.json )      # Configuração de componentes
-[`eslint.config.mjs`](eslint.config.mjs )    # Configuração do ESLint
 [`middleware.ts`](middleware.ts )        # Middleware para requisições
-[`next.config.ts`](next.config.ts )       # Configuração do Next.js
-[`package.json`](package.json )         # Dependências e scripts do projeto
-[`postcss.config.mjs`](postcss.config.mjs )   # Configuração do PostCSS
-[`tailwind.config.js`](tailwind.config.js )   # Configuração do Tailwind CSS
 [`tsconfig.json`](tsconfig.json )        # Configuração do TypeScript
-.next/               # Arquivos gerados pelo Next.js
 app/                 # Diretório principal da aplicação
 components/          # Componentes reutilizáveis
 doc/                 # Documentação adicional
 lib/                 # Bibliotecas auxiliares
 public/              # Arquivos públicos (imagens, fontes, etc.)
-utils/               # Funções utilitárias
 ```
 
 ## Tecnologias Utilizadas
