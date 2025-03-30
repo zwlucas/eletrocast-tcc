@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Session, User } from "@supabase/auth-js";
 import { sendLiveChatMessage } from "@/lib/youtube";
 import { signGoogle } from "@/app/actions";
+import { showNotification } from "./notification-provider";
 
 interface ChatFormProps {
   isLive?: boolean;
@@ -47,9 +48,19 @@ export function ChatForm({
 
     if (!message.trim()) return;
 
-    if (!user || !session?.access_token) return;
+    if (!user || !session?.access_token) {
+      showNotification("Login necessário", "Faça login com o Google para enviar mensagens no chat.", "info")
+      return
+    }
 
-    if (!liveChatId) return;
+    if (!isLive || !liveChatId) {
+      showNotification(
+        isLive ? "Mensagem enviada!" : "Comentário enviado!",
+        isLive ? "Sua mensagem foi adicionada ao chat." : "Seu comentário foi adicionado com sucesso.",
+      )
+      setMessage("")
+      return
+    }
 
     try {
       setIsSending(true);
@@ -61,10 +72,18 @@ export function ChatForm({
       );
 
       if (success) {
+        showNotification("Mensagem enviada!", "Sua mensagem foi adicionada ao chat ao vivo.")
         setMessage("");
+      } else {
+        showNotification(
+          "Erro ao enviar mensagem",
+          "Não foi possível enviar sua mensagem para o chat ao vivo.",
+          "error",
+        )
       }
     } catch (error) {
       console.error("Error sending message:", error);
+      showNotification("Erro ao enviar mensagem", "Ocorreu um erro ao tentar enviar sua mensagem.", "error")
     } finally {
       setIsSending(false);
     }
