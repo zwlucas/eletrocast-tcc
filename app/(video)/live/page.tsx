@@ -19,6 +19,7 @@ import {
 import { LiveBadge } from "@/components/live-badge";
 import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "@/components/video-player";
+import { showNotification } from "@/components/notification-provider";
 
 export default async function Home() {
   try {
@@ -103,6 +104,8 @@ function VideoInfo({
   const viewCount = formatCount(video.statistics.viewCount);/* 
   const likeCount = formatCount(video.statistics.likeCount);
   const subscriberCount = formatCount(channel.statistics.subscriberCount); */
+
+  showNotification("teste", "teste", "success");
 
   return (
     <div className="space-y-4">
