@@ -27,7 +27,7 @@ export function ChatForm({
   const [isSending, setIsSending] = useState(false);
 
   const fetchUser = async () => {
-    const supabase = await createClient();
+    const supabase = createClient();
 
     const {
       data: { user },
@@ -46,7 +46,10 @@ export function ChatForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!message.trim()) return;
+    if (!message.trim()) {
+      showNotification("Mensagem vazia", "Por favor, digite uma mensagem antes de enviar.", "warning")
+      return
+    }
 
     if (!user || !session?.access_token) {
       showNotification("Login necessário", "Faça login com o Google para enviar mensagens no chat.", "info")
