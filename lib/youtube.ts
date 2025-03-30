@@ -180,12 +180,23 @@ export interface YouTubePlaylistItem {
   };
 }
 
+export interface YouTubeVideoWithLiveDetails extends YouTubeVideo {
+  liveStreamingDetails?: {
+    actualStartTime?: string
+    actualEndTime?: string
+    scheduledStartTime?: string
+    scheduledEndTime?: string
+    concurrentViewers?: string
+    activeLiveChatId?: string
+  }
+}
+
 const API_BASE_URL = "https://www.googleapis.com/youtube/v3";
 
 export async function getVideoDetails(videoId: string): Promise<YouTubeVideo> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/videos?part=snippet,statistics,contentDetails&id=${videoId}&key=${process.env.YOUTUBE_API_KEY}`
+      `${API_BASE_URL}/videos?part=snippet,statistics,contentDetails,liveStreamingDetails&id=${videoId}&key=${process.env.YOUTUBE_API_KEY}`
     );
 
     if (!response.ok) {
@@ -328,6 +339,67 @@ export async function getChannelLatestVideoOrLiveStream(
   } catch (error) {
     console.error("Error fetching channel latest video or live stream:", error);
     throw new Error("Failed to fetch channel latest video or live stream");
+  }
+}
+
+/**
+ * Sends a message to a YouTube live chat
+ */
+export async function sendLiveChatMessage(liveChatId: string, message: string, accessToken: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/liveChat/messages?part=snippet`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        snippet: {
+          liveChatId: liveChatId,
+          type: "textMessageEvent",
+          textMessageDetails: {
+            messageText: message,
+          },
+        },
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error("YouTube API error:", errorData)
+      throw new Error(`YouTube API error: ${response.status}`)
+    }
+
+    return true
+  } catch (error) {
+    console.error("Error sending live chat message:", error)
+    return false
+  }
+}
+
+/**
+ * Gets the live chat ID for a live video
+ */
+export async function getLiveChatId(videoId: string): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/videos?part=liveStreamingDetails&id=${videoId}&key=${process.env.YOUTUBE_API_KEY}`,
+    )
+
+    if (!response.ok) {
+      throw new Error(`YouTube API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (!data.items || data.items.length === 0 || !data.items[0].liveStreamingDetails?.activeLiveChatId) {
+      return null
+    }
+
+    return data.items[0].liveStreamingDetails.activeLiveChatId
+  } catch (error) {
+    console.error("Error fetching live chat ID:", error)
+    return null
   }
 }
 

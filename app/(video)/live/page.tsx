@@ -14,6 +14,7 @@ import {
   YouTubeChannel,
   YouTubeCommentThread,
   YouTubeVideo,
+  getLiveChatId,
 } from "@/lib/youtube";
 import { LiveBadge } from "@/components/live-badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ export default async function Home() {
     const video = await getVideoDetails(videoId);
     const channel = await getChannelDetails(channelId);
     const comments = await getVideoComments(videoId, 50);
+    const liveChatId = isLive ? await getLiveChatId(videoId) : null;
 
     return (
       <>
@@ -63,7 +65,7 @@ export default async function Home() {
                     />
                   </TabsContent>
                   <TabsContent value="chat" className="mt-4">
-                    <CommentSection comments={comments} isLive={isLive} />
+                    <CommentSection comments={comments} isLive={isLive} liveChatId={liveChatId} videoId={videoId} />
                   </TabsContent>
                 </Tabs>
               </div>
@@ -76,7 +78,7 @@ export default async function Home() {
 
             {/* Desktop Chat Section */}
             <div className="hidden lg:block lg:col-span-1">
-              <CommentSection comments={comments} isLive={isLive} />
+              <CommentSection comments={comments} isLive={isLive} liveChatId={liveChatId} videoId={videoId} />
             </div>
           </div>
         </main>
@@ -146,9 +148,13 @@ function VideoInfo({
 function CommentSection({
   comments,
   isLive,
+  liveChatId,
+  videoId,
 }: {
   comments: YouTubeCommentThread[];
   isLive: boolean;
+  liveChatId: string | null;
+  videoId: string;
 }) {
   return (
     <div className="bg-muted/50 rounded-lg h-[400px] lg:h-[calc(100vh-200px)] flex flex-col lg:w-[400px]">
@@ -202,7 +208,7 @@ function CommentSection({
       </ScrollArea>
 
       <div className="p-4 border-t border-muted">
-        <ChatForm isLive={isLive} />
+        <ChatForm isLive={isLive} liveChatId={liveChatId} videoId={videoId} />
       </div>
     </div>
   );
