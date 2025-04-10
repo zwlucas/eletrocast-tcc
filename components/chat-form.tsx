@@ -58,7 +58,7 @@ export function ChatForm({
       return;
     }
 
-    if (!user || !session?.access_token) {
+    if (!user || !session?.provider_token) {
       showNotification(
         "Login necessário",
         "Faça login com o Google para enviar mensagens no chat.",
@@ -79,7 +79,7 @@ export function ChatForm({
         success = await sendLiveChatMessage(
           liveChatId,
           message,
-          session.access_token
+          session.provider_token
         );
 
         if (success) {
@@ -95,7 +95,7 @@ export function ChatForm({
           );
         }
       } else {
-        success = await addVideoComment(videoId, message, session.access_token);
+        success = await addVideoComment(videoId, message, session.provider_token);
 
         if (success) {
           showNotification(

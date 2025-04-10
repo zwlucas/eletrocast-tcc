@@ -412,11 +412,11 @@ export async function addVideoComment(
   accessToken: string
 ): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/commentThreads?part=snippet&access_token=${accessToken}`, {
+    const response = await fetch(`${API_BASE_URL}/commentThreads?part=snippet`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.YOUTUBE_API_KEY}`
+        'Authorization': `Bearer ${accessToken}`
       },
       body: JSON.stringify({
         snippet: {
