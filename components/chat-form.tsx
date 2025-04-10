@@ -45,6 +45,12 @@ export function ChatForm({
     fetchUser();
   });
 
+  showNotification(
+    "Teste",
+    session?.access_token,
+    "warning"
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
