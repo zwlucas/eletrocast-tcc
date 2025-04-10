@@ -6,7 +6,7 @@ import { Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Session, User } from "@supabase/auth-js";
-import { sendLiveChatMessage } from "@/lib/youtube";
+import { addVideoComment, sendLiveChatMessage } from "@/lib/youtube";
 import { signGoogle } from "@/app/actions";
 import { showNotification } from "./notification-provider";
 
@@ -14,12 +14,14 @@ interface ChatFormProps {
   isLive?: boolean;
   liveChatId?: string | null;
   videoId: string;
+  onCommentAdded?: (text: string) => void;
 }
 
 export function ChatForm({
   isLive = false,
   liveChatId,
   videoId,
+  onCommentAdded,
 }: ChatFormProps) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -47,46 +49,89 @@ export function ChatForm({
     e.preventDefault();
 
     if (!message.trim()) {
-      showNotification("Mensagem vazia", "Por favor, digite uma mensagem antes de enviar.", "warning")
-      return
+      showNotification(
+        "Mensagem vazia",
+        "Por favor, digite uma mensagem antes de enviar.",
+        "warning"
+      );
+      return;
     }
 
     if (!user || !session?.access_token) {
-      showNotification("Login necessário", "Faça login com o Google para enviar mensagens no chat.", "info")
-      return
+      showNotification(
+        "Login necessário",
+        "Faça login com o Google para enviar mensagens no chat.",
+        "info"
+      );
+      return;
     }
 
     if (!isLive || !liveChatId) {
       showNotification(
         isLive ? "Mensagem enviada!" : "Comentário enviado!",
-        isLive ? "Sua mensagem foi adicionada ao chat." : "Seu comentário foi adicionado com sucesso.",
-      )
-      setMessage("")
-      return
+        isLive
+          ? "Sua mensagem foi adicionada ao chat."
+          : "Seu comentário foi adicionado com sucesso."
+      );
+      setMessage("");
+      return;
     }
 
     try {
       setIsSending(true);
 
-      const success = await sendLiveChatMessage(
-        liveChatId,
-        message,
-        session.access_token
-      );
+      let success = false;
+
+      if (isLive && liveChatId) {
+        success = await sendLiveChatMessage(
+          liveChatId,
+          message,
+          session.access_token
+        );
+
+        if (success) {
+          showNotification(
+            "Mensagem enviada!",
+            "Sua mensagem foi adicionada ao chat ao vivo."
+          );
+        } else {
+          showNotification(
+            "Erro ao enviar mensagem",
+            "Não foi possível enviar sua mensagem para o chat ao vivo.",
+            "error"
+          );
+        }
+      } else {
+        success = await addVideoComment(videoId, message, session.access_token);
+
+        if (success) {
+          showNotification(
+            "Comentário enviado!",
+            "Seu comentário foi adicionado ao vídeo com sucesso."
+          );
+
+          if (onCommentAdded) {
+            onCommentAdded(message);
+          }
+        } else {
+          showNotification(
+            "Erro ao enviar comentário",
+            "Não foi possível adicionar seu comentário ao vídeo.",
+            "error"
+          );
+        }
+      }
 
       if (success) {
-        showNotification("Mensagem enviada!", "Sua mensagem foi adicionada ao chat ao vivo.")
-        setMessage("");
-      } else {
-        showNotification(
-          "Erro ao enviar mensagem",
-          "Não foi possível enviar sua mensagem para o chat ao vivo.",
-          "error",
-        )
+        setMessage("")
       }
     } catch (error) {
-      console.error("Error sending message:", error);
-      showNotification("Erro ao enviar mensagem", "Ocorreu um erro ao tentar enviar sua mensagem.", "error")
+      console.error("Error sending message/comment:", error)
+      showNotification(
+        isLive ? "Erro ao enviar mensagem" : "Erro ao enviar comentário",
+        "Ocorreu um erro ao tentar enviar. Por favor, tente novamente.",
+        "error",
+      );
     } finally {
       setIsSending(false);
     }
@@ -97,7 +142,7 @@ export function ChatForm({
       {!user ? (
         <div className="text-center">
           <Button onClick={signGoogle} variant={"outline"} className="w-full">
-            Faça login com o Google para participar do chat
+            Faça login com Google para {isLive ? "participar do chat" : "comentar"}
           </Button>
         </div>
       ) : (

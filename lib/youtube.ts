@@ -403,6 +403,46 @@ export async function getLiveChatId(videoId: string): Promise<string | null> {
   }
 }
 
+/**
+ * Adds a comment to a YouTube video
+ */
+export async function addVideoComment(
+  videoId: string,
+  commentText: string,
+  accessToken: string
+): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/commentThreads?part=snippet`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        snippet: {
+          videoId: videoId,
+          topLevelComment: {
+            snippet: {
+              textOriginal: commentText
+            }
+          }
+        }
+      })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('YouTube API error:', errorData)
+      throw new Error(`YouTube API error: ${response.status}`)
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error adding video comment:', error)
+    return false
+  }
+}
+
 export function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
