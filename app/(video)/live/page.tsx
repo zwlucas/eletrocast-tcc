@@ -19,6 +19,7 @@ import {
 import { LiveBadge } from "@/components/live-badge";
 import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "@/components/video-player";
+import { NotificationProvider } from "@/components/notification-provider";
 
 export default async function Home() {
   try {
@@ -34,6 +35,8 @@ export default async function Home() {
 
     return (
       <>
+        <NotificationProvider />
+
         {/* Main Content */}
         <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 lg:p-6 -mt-20">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
