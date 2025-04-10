@@ -54,6 +54,7 @@ export function ChatForm({
         "Por favor, digite uma mensagem antes de enviar.",
         "warning"
       );
+      console.log("test4")
       return;
     }
 
@@ -63,6 +64,7 @@ export function ChatForm({
         "Faça login com o Google para enviar mensagens no chat.",
         "info"
       );
+      console.log("test1")
       return;
     }
 
@@ -74,6 +76,7 @@ export function ChatForm({
           : "Seu comentário foi adicionado com sucesso."
       );
       setMessage("");
+      console.log("test2")
       return;
     }
 
