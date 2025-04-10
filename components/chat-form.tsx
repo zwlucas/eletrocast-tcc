@@ -68,18 +68,6 @@ export function ChatForm({
       return;
     }
 
-    if (!isLive || !liveChatId) {
-      showNotification(
-        isLive ? "Mensagem enviada!" : "Comentário enviado!",
-        isLive
-          ? "Sua mensagem foi adicionada ao chat."
-          : "Seu comentário foi adicionado com sucesso."
-      );
-      setMessage("");
-      console.log("test2")
-      return;
-    }
-
     console.log("teste")
 
     try {
