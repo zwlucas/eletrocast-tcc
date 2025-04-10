@@ -412,7 +412,7 @@ export async function addVideoComment(
   accessToken: string
 ): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/commentThreads?part=snippet`, {
+    const response = await fetch(`${API_BASE_URL}/commentThreads?part=snippet&access_token=${accessToken}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
