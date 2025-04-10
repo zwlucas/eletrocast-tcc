@@ -77,6 +77,8 @@ export function ChatForm({
       return;
     }
 
+    console.log("teste")
+
     try {
       setIsSending(true);
 
